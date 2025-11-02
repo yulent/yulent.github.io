@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE html>
 <html lang="en-US">
   <head>
@@ -73,3 +74,38 @@
     </div>
   </body>
 </html>
+-->
+
+<!doctype html>
+<meta charset="utf-8">
+<script>
+(function() {
+  const params = new URLSearchParams(location.search);
+  let q = params.get("q");
+  if (!q) {
+    document.write("usage: ?q=1+1");
+    return;
+  }
+
+  // remove surrounding quotes
+  if ((q.startsWith('"') && q.endsWith('"')) || (q.startsWith("'") && q.endsWith("'")))
+    q = q.slice(1, -1);
+
+  // Validate (allow only numbers, + - * / ^ . ( ) and spaces)
+  if (!/^[0-9+\-*/^().\s]+$/.test(q)) {
+    document.write("Error: invalid characters.");
+    return;
+  }
+
+  try {
+    // safe eval
+    const result = Function(`"use strict";return (${q.replace(/\^/g,"**")})`)();
+    if (typeof result === "number" && isFinite(result))
+      document.write(result);
+    else
+      document.write("Error: not a valid arithmetic expression.");
+  } catch (e) {
+    document.write("Error: " + e.message);
+  }
+})();
+</script>
