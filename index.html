@@ -83,29 +83,37 @@
   const params = new URLSearchParams(location.search);
   let q = params.get("q");
   if (!q) {
-    document.write("usage: ?q=1+1");
+    document.open("text/plain");
+    document.write("Usage: ?q=1+1");
+    document.close();
     return;
   }
 
-  // remove surrounding quotes
+  q = decodeURIComponent(q.replace(/\+/g, "%2B"));
+
   if ((q.startsWith('"') && q.endsWith('"')) || (q.startsWith("'") && q.endsWith("'")))
     q = q.slice(1, -1);
 
-  // Validate (allow only numbers, + - * / ^ . ( ) and spaces)
   if (!/^[0-9+\-*/^().\s]+$/.test(q)) {
-    document.write("Error: invalid characters.");
+    document.open("text/plain");
+    document.write("Error: invalid characters");
+    document.close();
     return;
   }
 
   try {
-    // safe eval
-    const result = Function(`"use strict";return (${q.replace(/\^/g,"**")})`)();
-    if (typeof result === "number" && isFinite(result))
+    const result = Function(`"use strict";return (${q.replace(/\^/g, "**")})`)();
+    document.open("text/plain");
+    if (typeof result === "number" && isFinite(result)) {
       document.write(result);
-    else
-      document.write("Error: not a valid arithmetic expression.");
+    } else {
+      document.write("Error: invalid expression");
+    }
+    document.close();
   } catch (e) {
+    document.open("text/plain");
     document.write("Error: " + e.message);
+    document.close();
   }
 })();
 </script>
